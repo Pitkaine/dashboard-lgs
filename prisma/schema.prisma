@@ -1,0 +1,196 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// MODELES EXISTANTS (site principal)
+// ==========================================
+
+model Team {
+  id   Int    @id @default(autoincrement())
+  img  String
+  name String
+  job  String
+  job2 String
+}
+
+model Article {
+  id          Int      @id @default(autoincrement())
+  language    Language
+  title       String   @db.VarChar(255)
+  description String   @db.Text
+  type        String   @db.VarChar(255)
+  content     String   @db.LongText
+  contentImg  Json
+  thumbnail   String
+  banner      String
+  statut      String   @default("0")
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ==========================================
+// NOUVEAUX MODELES (Dashboard CMS)
+// ==========================================
+
+// Authentification
+model User {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+  name     String
+  role     String @default("admin")
+}
+
+// Pages editables
+model Page {
+  id        Int           @id @default(autoincrement())
+  slug      String        @unique
+  type      PageType
+  status    Status        @default(DRAFT)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  contents  PageContent[]
+  seo       PageSeo[]
+}
+
+model PageContent {
+  id        Int      @id @default(autoincrement())
+  pageId    Int
+  page      Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  language  Language
+  title     String
+  body      Json
+  updatedAt DateTime @updatedAt
+
+  @@unique([pageId, language])
+}
+
+model PageSeo {
+  id              Int      @id @default(autoincrement())
+  pageId          Int
+  page            Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  language        Language
+  metaTitle       String
+  metaDescription String   @db.Text
+  ogImage         String?
+  jsonLd          Json?
+
+  @@unique([pageId, language])
+}
+
+// Portfolio
+model Wedding {
+  id        Int              @id @default(autoincrement())
+  slug      String           @unique
+  date      DateTime
+  status    Status           @default(DRAFT)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  details   WeddingContent[]
+  media     WeddingMedia[]
+}
+
+model WeddingContent {
+  id          Int      @id @default(autoincrement())
+  weddingId   Int
+  wedding     Wedding  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  language    Language
+  title       String
+  location    String
+  venue       String?
+  description String   @db.Text
+  body        Json?
+
+  @@unique([weddingId, language])
+}
+
+model WeddingMedia {
+  id        Int       @id @default(autoincrement())
+  weddingId Int
+  wedding   Wedding   @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  type      MediaType
+  url       String
+  thumbnail String?
+  caption   String?
+  position  Int       @default(0)
+  isCover   Boolean   @default(false)
+}
+
+// Tarifs
+model PricingPlan {
+  id        Int              @id @default(autoincrement())
+  slug      String           @unique
+  price     String
+  isPopular Boolean          @default(false)
+  position  Int              @default(0)
+  status    Status           @default(PUBLISHED)
+  contents  PricingContent[]
+  features  PricingFeature[]
+}
+
+model PricingContent {
+  id          Int         @id @default(autoincrement())
+  planId      Int
+  plan        PricingPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  language    Language
+  name        String
+  subtitle    String?
+  description String?     @db.Text
+
+  @@unique([planId, language])
+}
+
+model PricingFeature {
+  id       Int         @id @default(autoincrement())
+  planId   Int
+  plan     PricingPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  language Language
+  text     String
+  included Boolean     @default(true)
+  position Int         @default(0)
+}
+
+// Settings globaux
+model SiteSetting {
+  id    Int    @id @default(autoincrement())
+  key   String @unique
+  value String @db.Text
+  group String
+}
+
+// ==========================================
+// ENUMS
+// ==========================================
+
+enum PageType {
+  SERVICE
+  GEO
+  LANDING
+  LEGAL
+  BLOG
+}
+
+enum Status {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum Language {
+  fr
+  en
+}
+
+enum MediaType {
+  PHOTO
+  VIDEO
+  YOUTUBE
+}
