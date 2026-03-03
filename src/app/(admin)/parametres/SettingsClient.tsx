@@ -23,24 +23,35 @@ type SettingsGroup = Record<
 >;
 
 const GROUP_LABELS: Record<string, { label: string; icon: React.ReactNode }> = {
-  general: { label: "Général", icon: <Globe className="size-4" /> },
   contact: { label: "Contact", icon: <Mail className="size-4" /> },
   social: { label: "Réseaux sociaux", icon: <Share2 className="size-4" /> },
-  seo: { label: "SEO", icon: <Settings className="size-4" /> },
+  seo: { label: "SEO", icon: <Globe className="size-4" /> },
+  business: { label: "Entreprise", icon: <Settings className="size-4" /> },
+  pricing: { label: "Tarifs", icon: <Phone className="size-4" /> },
 };
 
 const KEY_LABELS: Record<string, string> = {
-  site_name: "Nom du site",
-  site_description: "Description du site",
   contact_email: "Email de contact",
-  contact_phone: "Téléphone",
+  contact_phone_fr: "Téléphone France",
+  contact_phone_pt: "Téléphone Portugal",
   contact_address: "Adresse",
-  instagram_url: "Instagram",
-  facebook_url: "Facebook",
-  youtube_url: "YouTube",
-  tiktok_url: "TikTok",
-  ga_measurement_id: "Google Analytics (GA4 ID)",
-  gsc_verification: "Google Search Console (verification)",
+  social_instagram: "Instagram",
+  social_facebook: "Facebook",
+  social_youtube: "YouTube",
+  social_tiktok: "TikTok",
+  seo_site_name_fr: "Nom du site (FR)",
+  seo_site_name_en: "Nom du site (EN)",
+  seo_default_og_image: "Image OG par défaut",
+  seo_ga4_id: "Google Analytics (GA4 ID)",
+  business_name: "Raison sociale",
+  business_country: "Pays",
+  business_owners: "Gérants",
+  business_brand_fr: "Marque (FR)",
+  business_brand_en: "Marque (EN)",
+  pricing_starting_price: "Prix d appel (euros)",
+  pricing_currency: "Devise",
+  pricing_extra_hour: "Heure supplémentaire (euros)",
+  pricing_deposit_percent: "Acompte requis (%)",
 };
 
 export default function SettingsClient({
