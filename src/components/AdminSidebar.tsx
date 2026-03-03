@@ -13,6 +13,7 @@ import {
   LogOut,
   Menu,
   Settings,
+  HelpCircle,
   Users,
   X,
 } from "lucide-react";
@@ -31,6 +32,7 @@ const navItems = [
   { title: "Pages geo", href: "/geo", icon: Globe },
   { title: "Equipe", href: "/equipe", icon: Users },
   { title: "Parametres", href: "/parametres", icon: Settings },
+  { title: "Guide", href: "/guide", icon: HelpCircle },
 ];
 
 export default function AdminSidebar() {
