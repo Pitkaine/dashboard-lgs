@@ -102,12 +102,18 @@ BDD         : Meme MySQL que le site principal
 
 ## REGLES OBLIGATOIRES
 
-### 1. Deploiement
+### 1. Deploiement & Git
 ```bash
 cd /var/www/dashboard-lgs
 npm run build && su - lgs -c 'pm2 restart dashboard-lgs'
 ```
 Verifier : `curl -s -o /dev/null -w %{http_code} https://dashboard.lesgarssympas.com`
+
+**Après chaque deploy réussi, TOUJOURS push sur GitHub :**
+```bash
+cd /var/www/dashboard-lgs && git add -A && git commit -m "description" && git push
+```
+**Le repo GitHub (Pitkaine/dashboard-lgs) doit TOUJOURS refléter le code en production.**
 
 ### 2. BDD partagee
 - **NE JAMAIS** modifier les modeles Team et Article sans verifier la compatibilite avec le site principal
