@@ -18,24 +18,30 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { name, job, job2, img } = body;
+    const { name, job, job2, img, imgPosition } = body;
 
     if (!name || !job) {
       return NextResponse.json(
-        { error: "Nom et métier requis" },
+        { error: "Nom et m\u00e9tier requis" },
         { status: 400 }
       );
     }
 
     const member = await prisma.team.create({
-      data: { name, job, job2: job2 || "", img: img || "" },
+      data: {
+        name,
+        job,
+        job2: job2 || "",
+        img: img || "",
+        imgPosition: imgPosition || "center",
+      },
     });
 
     return NextResponse.json(member, { status: 201 });
   } catch (error) {
     console.error("Create team error:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la création" },
+      { error: "Erreur lors de la cr\u00e9ation" },
       { status: 500 }
     );
   }

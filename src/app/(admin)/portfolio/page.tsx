@@ -10,7 +10,7 @@ export default async function PortfolioPage() {
       media: {
         where: { isCover: true },
         take: 1,
-        select: { url: true, type: true },
+        select: { url: true, type: true, thumbnail: true },
       },
     },
     orderBy: { date: "desc" },

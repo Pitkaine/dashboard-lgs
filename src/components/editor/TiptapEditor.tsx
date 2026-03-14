@@ -79,6 +79,13 @@ export default function TiptapEditor({
       onChange?.(editor.getJSON());
     },
     editorProps: {
+      // Strip inline color/background styles from pasted content
+      transformPastedHTML(html: string) {
+        return html
+          .replace(/\s*color\s*:\s*[^;"]+;?/gi, "")
+          .replace(/\s*background-color\s*:\s*[^;"]+;?/gi, "")
+          .replace(/\s*background\s*:\s*[^;"]+;?/gi, "");
+      },
       attributes: {
         class:
           "prose prose-sm sm:prose-base max-w-none min-h-[400px] p-4 focus:outline-none " +

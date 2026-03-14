@@ -7,14 +7,8 @@ import sharp from "sharp";
 
 // Upload to the main site's public folder so images are served directly
 const UPLOAD_BASE = "/var/www/lesgarssympas/public/uploads";
-const VIDEO_BASE = "/var/www/lesgarssympas/public/video";
 const MAX_WIDTH = 1200;
 const QUALITY = 80;
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
-const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
-
-const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const ALLOWED_VIDEO_TYPES = ["video/webm", "video/mp4"];
 
 export async function POST(request: NextRequest) {
   const authError = await requireAuth();
@@ -32,60 +26,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const isVideo = ALLOWED_VIDEO_TYPES.includes(file.type);
-    const isImage = ALLOWED_IMAGE_TYPES.includes(file.type);
-
-    if (!isVideo && !isImage) {
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
       return NextResponse.json(
-        { error: "Format non supporté. Images: JPG, PNG, WebP, GIF. Vidéos: WebM, MP4" },
+        { error: "Seules les images sont acceptées" },
         { status: 400 }
       );
     }
 
-    // Validate file size
-    const maxSize = isVideo ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE;
-    if (file.size > maxSize) {
+    // Validate file size (10MB max)
+    if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json(
-        { error: `Le fichier ne doit pas dépasser ${maxSize / (1024 * 1024)} Mo` },
+        { error: "L'image ne doit pas dépasser 10 Mo" },
         { status: 400 }
       );
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
+    // Sanitize path to prevent directory traversal
+    const safePath = uploadPath.replace(/[^a-zA-Z0-9-_]/g, "");
+    const uploadDir = path.join(UPLOAD_BASE, safePath);
+
+    // Create directory if it doesn't exist
+    if (!existsSync(uploadDir)) {
+      await mkdir(uploadDir, { recursive: true });
+    }
+
+    // Generate unique filename
     const timestamp = Date.now();
     const safeName = file.name
       .replace(/\.[^/.]+$/, "")
       .replace(/[^a-zA-Z0-9-_]/g, "-")
       .toLowerCase();
-
-    if (isVideo) {
-      // Video: save directly without processing
-      if (!existsSync(VIDEO_BASE)) {
-        await mkdir(VIDEO_BASE, { recursive: true });
-      }
-      const ext = file.type === "video/mp4" ? "mp4" : "webm";
-      const filename = `${safeName}-${timestamp}.${ext}`;
-      const filepath = path.join(VIDEO_BASE, filename);
-      await writeFile(filepath, buffer);
-
-      return NextResponse.json({
-        url: `/video/${filename}`,
-        filename,
-        size: buffer.length,
-      });
-    }
-
-    // Image: process with sharp (resize + WebP)
-    const safePath = uploadPath.replace(/[^a-zA-Z0-9-_]/g, "");
-    const uploadDir = path.join(UPLOAD_BASE, safePath);
-
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
-    }
-
     const filename = `${safeName}-${timestamp}.webp`;
     const filepath = path.join(uploadDir, filename);
 
+    // Process image: resize + convert to WebP
+    const buffer = Buffer.from(await file.arrayBuffer());
     const image = sharp(buffer);
     const metadata = await image.metadata();
 
@@ -97,6 +73,7 @@ export async function POST(request: NextRequest) {
     const webpBuffer = await processedImage.webp({ quality: QUALITY }).toBuffer();
     await writeFile(filepath, webpBuffer);
 
+    // Return the URL relative to the main site
     const url = `/uploads/${safePath}/${filename}`;
 
     return NextResponse.json({

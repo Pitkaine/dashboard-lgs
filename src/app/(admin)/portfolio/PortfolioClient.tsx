@@ -40,7 +40,7 @@ type WeddingSummary = {
   createdAt: Date;
   updatedAt: Date;
   details: { language: string; title: string; location: string }[];
-  media: { url: string; type: string }[];
+  media: { url: string; type: string; thumbnail: string | null }[];
 };
 
 export default function PortfolioClient({
@@ -147,7 +147,7 @@ export default function PortfolioClient({
                   <div className="relative aspect-[16/10] bg-neutral-100">
                     {coverMedia ? (
                       <Image
-                        src={coverMedia.url}
+                        src={coverMedia.thumbnail || coverMedia.url}
                         alt={frDetail?.title || "Mariage"}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"

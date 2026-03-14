@@ -59,8 +59,8 @@ const typeLabels: Record<string, { label: string; icon: React.ReactNode }> = {
 };
 
 const statusColors: Record<string, string> = {
-  PUBLISHED: "bg-emerald-100 text-emerald-700",
-  DRAFT: "bg-amber-100 text-amber-700",
+  PUBLISHED: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+  DRAFT: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
 };
 
 export default function PagesClient({
@@ -122,8 +122,8 @@ export default function PagesClient({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Pages</h1>
-          <p className="text-sm text-neutral-500 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Pages</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Gérez les pages du site (services, géo, légal)
           </p>
         </div>
@@ -140,7 +140,7 @@ export default function PagesClient({
         <CardContent className="pt-4">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-neutral-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
               <Input
                 placeholder="Rechercher par titre ou slug..."
                 value={search}
@@ -179,11 +179,11 @@ export default function PagesClient({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Titre</TableHead>
-                <TableHead className="w-[100px]">Type</TableHead>
+                <TableHead>Page</TableHead>
+                <TableHead className="w-[120px]">Slug</TableHead>
                 <TableHead className="w-[100px]">Langues</TableHead>
                 <TableHead className="w-[100px]">Statut</TableHead>
-                <TableHead className="w-[150px]">Dernière modif.</TableHead>
+                <TableHead className="w-[130px]">Modifié</TableHead>
                 <TableHead className="w-[50px]" />
               </TableRow>
             </TableHeader>
@@ -192,7 +192,7 @@ export default function PagesClient({
                 <TableRow>
                   <TableCell
                     colSpan={6}
-                    className="text-center py-8 text-neutral-500"
+                    className="text-center py-8 text-muted-foreground"
                   >
                     {pages.length === 0
                       ? "Aucune page créée"
@@ -221,24 +221,22 @@ export default function PagesClient({
                       <TableCell>
                         <Link
                           href={`/pages/${page.id}`}
-                          className="hover:text-amber-600 transition-colors"
+                          className="hover:text-amber-500 transition-colors"
                         >
-                          <div className="font-medium text-neutral-900">
-                            {frContent?.title || enContent?.title || "Sans titre"}
-                          </div>
-                          <div className="text-xs text-neutral-400 mt-0.5">
-                            /{page.slug}
+                          <div className="flex items-center gap-2">
+                            <span className="text-muted-foreground">{typeInfo.icon}</span>
+                            <div>
+                              <div className="font-medium text-foreground">
+                                {frContent?.title || enContent?.title || "Sans titre"}
+                              </div>
+                            </div>
                           </div>
                         </Link>
                       </TableCell>
                       <TableCell>
-                        <Badge
-                          variant="outline"
-                          className="gap-1 font-normal"
-                        >
-                          {typeInfo.icon}
-                          {typeInfo.label}
-                        </Badge>
+                        <code className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                          /{page.slug}
+                        </code>
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
@@ -246,8 +244,8 @@ export default function PagesClient({
                             variant={hasLangs.fr ? "default" : "outline"}
                             className={`text-[10px] px-1.5 py-0 ${
                               hasLangs.fr
-                                ? "bg-blue-100 text-blue-700 hover:bg-blue-100"
-                                : "text-neutral-400"
+                                ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                                : "text-muted-foreground"
                             }`}
                           >
                             FR
@@ -256,8 +254,8 @@ export default function PagesClient({
                             variant={hasLangs.en ? "default" : "outline"}
                             className={`text-[10px] px-1.5 py-0 ${
                               hasLangs.en
-                                ? "bg-blue-100 text-blue-700 hover:bg-blue-100"
-                                : "text-neutral-400"
+                                ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                                : "text-muted-foreground"
                             }`}
                           >
                             EN
@@ -273,7 +271,7 @@ export default function PagesClient({
                           {page.status === "PUBLISHED" ? "Publié" : "Brouillon"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-sm text-neutral-500">
+                      <TableCell className="text-sm text-muted-foreground">
                         {new Date(page.updatedAt).toLocaleDateString("fr-FR", {
                           day: "2-digit",
                           month: "short",

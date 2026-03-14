@@ -50,6 +50,7 @@ export async function PUT(request: NextRequest) {
 }
 
 function inferGroup(key: string): string {
+  if (key.startsWith("hero_") || key.startsWith("footer_badge_")) return "appearance";
   if (key.startsWith("contact_")) return "contact";
   if (key.includes("_url") || key.includes("social")) return "social";
   if (key.startsWith("ga_") || key.startsWith("gsc_") || key.includes("seo"))

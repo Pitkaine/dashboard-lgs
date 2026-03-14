@@ -1,5 +1,8 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
-  provider      = "prisma-client-js"
+  provider = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
@@ -13,34 +16,39 @@ datasource db {
 // ==========================================
 
 model Team {
-  id   Int    @id @default(autoincrement())
-  img  String
-  name String
-  job  String
-  job2 String
+  id          Int    @id @default(autoincrement())
+  img         String
+  name        String
+  job         String
+  job2        String
+  imgPosition String @default("center")
 }
 
 model Article {
-  id          Int      @id @default(autoincrement())
-  language    Language
-  title       String   @db.VarChar(255)
-  description String   @db.Text
-  type        String   @db.VarChar(255)
-  content     String   @db.LongText
-  contentImg  Json
-  thumbnail   String
-  banner      String
-  statut      String   @default("0")
-  views       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              Int       @id @default(autoincrement())
+  language        Language
+  linkedArticleId Int?
+  title           String    @db.VarChar(255)
+  description     String    @db.Text
+  type            String    @db.VarChar(255)
+  content         String    @db.LongText
+  contentImg      Json
+  thumbnail       String
+  banner          String
+  statut          String    @default("0")
+  views           Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([language])
+  @@index([statut])
+  @@index([linkedArticleId])
 }
 
 // ==========================================
-// NOUVEAUX MODELES (Dashboard CMS)
+// MODELES DASHBOARD CMS (lecture seule)
 // ==========================================
 
-// Authentification
 model User {
   id       Int    @id @default(autoincrement())
   email    String @unique
@@ -49,7 +57,6 @@ model User {
   role     String @default("admin")
 }
 
-// Pages editables
 model Page {
   id        Int           @id @default(autoincrement())
   slug      String        @unique
@@ -71,6 +78,8 @@ model PageContent {
   updatedAt DateTime @updatedAt
 
   @@unique([pageId, language])
+  @@index([pageId])
+  @@index([language])
 }
 
 model PageSeo {
@@ -84,9 +93,10 @@ model PageSeo {
   jsonLd          Json?
 
   @@unique([pageId, language])
+  @@index([pageId])
+  @@index([language])
 }
 
-// Portfolio
 model Wedding {
   id        Int              @id @default(autoincrement())
   slug      String           @unique
@@ -110,6 +120,8 @@ model WeddingContent {
   body        Json?
 
   @@unique([weddingId, language])
+  @@index([weddingId])
+  @@index([language])
 }
 
 model WeddingMedia {
@@ -122,9 +134,11 @@ model WeddingMedia {
   caption   String?
   position  Int       @default(0)
   isCover   Boolean   @default(false)
+
+  @@index([weddingId])
+  @@index([type])
 }
 
-// Tarifs
 model PricingPlan {
   id        Int              @id @default(autoincrement())
   slug      String           @unique
@@ -146,6 +160,8 @@ model PricingContent {
   description String?     @db.Text
 
   @@unique([planId, language])
+  @@index([planId])
+  @@index([language])
 }
 
 model PricingFeature {
@@ -156,14 +172,30 @@ model PricingFeature {
   text     String
   included Boolean     @default(true)
   position Int         @default(0)
+
+  @@index([planId])
+  @@index([language])
 }
 
-// Settings globaux
 model SiteSetting {
   id    Int    @id @default(autoincrement())
   key   String @unique
   value String @db.Text
   group String
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  name      String
+  note      Int      @default(5)
+  picture   String?
+  review    String   @db.Text
+  source    String   @default("google")
+  status    Status   @default(PUBLISHED)
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([status])
 }
 
 // ==========================================
@@ -193,4 +225,98 @@ enum MediaType {
   PHOTO
   VIDEO
   YOUTUBE
+}
+
+model FaqItem {
+  id        Int          @id @default(autoincrement())
+  position  Int          @default(0)
+  status    Status       @default(PUBLISHED)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  contents  FaqContent[]
+
+  @@index([status])
+}
+
+model FaqContent {
+  id        Int      @id @default(autoincrement())
+  faqItemId Int
+  faqItem   FaqItem  @relation(fields: [faqItemId], references: [id], onDelete: Cascade)
+  language  Language
+  question  String   @db.Text
+  answer    String   @db.Text
+
+  @@unique([faqItemId, language])
+  @@index([faqItemId])
+  @@index([language])
+}
+
+// Options tarifaires (gérées depuis le dashboard)
+model PricingOption {
+  id        Int                    @id @default(autoincrement())
+  price     String?                // Prix interne (visible admin uniquement)
+  position  Int                    @default(0)
+  status    Status                 @default(PUBLISHED)
+  contents  PricingOptionContent[]
+
+  @@index([status])
+}
+
+model PricingOptionContent {
+  id          Int            @id @default(autoincrement())
+  optionId    Int
+  option      PricingOption  @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  language    Language
+  name        String
+  description String         @db.Text
+
+  @@unique([optionId, language])
+  @@index([optionId])
+  @@index([language])
+}
+
+// Informations pratiques (gérées depuis le dashboard)
+model PracticalInfo {
+  id        Int                    @id @default(autoincrement())
+  position  Int                    @default(0)
+  status    Status                 @default(PUBLISHED)
+  contents  PracticalInfoContent[]
+
+  @@index([status])
+}
+
+model PracticalInfoContent {
+  id             Int            @id @default(autoincrement())
+  practicalInfoId Int
+  practicalInfo  PracticalInfo  @relation(fields: [practicalInfoId], references: [id], onDelete: Cascade)
+  language       Language
+  text           String         @db.Text
+
+  @@unique([practicalInfoId, language])
+  @@index([practicalInfoId])
+  @@index([language])
+}
+
+// ==========================================
+// MESSAGES DE CONTACT
+// ==========================================
+
+model ContactMessage {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String
+  phone        String?
+  weddingDate  String?
+  venue        String?
+  guests       String?
+  serviceType  String?
+  referral     String?
+  message      String   @db.Text
+  locale       String   @default("fr") @db.VarChar(5)
+  isRead       Boolean  @default(false)
+  emailSent    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@index([isRead])
+  @@index([createdAt])
 }

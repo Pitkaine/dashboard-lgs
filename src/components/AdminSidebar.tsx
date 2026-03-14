@@ -12,8 +12,11 @@ import {
   Globe,
   LogOut,
   Menu,
+  MessageSquareQuote,
   Settings,
   HelpCircle,
+  MessageCircleQuestion,
+  Mail,
   Users,
   X,
 } from "lucide-react";
@@ -31,6 +34,9 @@ const navItems = [
   { title: "Tarifs", href: "/tarifs", icon: DollarSign },
   { title: "Pages geo", href: "/geo", icon: Globe },
   { title: "Equipe", href: "/equipe", icon: Users },
+  { title: "Avis", href: "/avis", icon: MessageSquareQuote },
+  { title: "FAQ", href: "/faq", icon: MessageCircleQuestion },
+  { title: "Messages", href: "/messages", icon: Mail },
   { title: "Parametres", href: "/parametres", icon: Settings },
   { title: "Guide", href: "/guide", icon: HelpCircle },
 ];

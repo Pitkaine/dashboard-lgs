@@ -99,12 +99,11 @@ export default function TarifsClient({ plans }: { plans: PlanSummary[] }) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Actions */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Tarifs</h1>
+          
           <p className="text-sm text-neutral-500 mt-1">
-            Gérez les formules et tarifs ({items.length} formules)
           </p>
         </div>
         <Link href="/tarifs/new">

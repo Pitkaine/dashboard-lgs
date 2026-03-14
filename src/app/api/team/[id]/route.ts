@@ -18,7 +18,7 @@ export async function PUT(
 
   try {
     const body = await request.json();
-    const { name, job, job2, img } = body;
+    const { name, job, job2, img, imgPosition } = body;
 
     const member = await prisma.team.update({
       where: { id: memberId },
@@ -27,6 +27,7 @@ export async function PUT(
         job: job || undefined,
         job2: job2 !== undefined ? job2 : undefined,
         img: img !== undefined ? img : undefined,
+        imgPosition: imgPosition !== undefined ? imgPosition : undefined,
       },
     });
 
@@ -34,7 +35,7 @@ export async function PUT(
   } catch (error) {
     console.error("Update team error:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la mise à jour" },
+      { error: "Erreur lors de la mise \u00e0 jour" },
       { status: 500 }
     );
   }
